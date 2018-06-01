@@ -37,7 +37,7 @@
           </b-form-group>
         </b-tab>
 
-        <b-tab :title="'Sites (' + ((this.siteNamesSelected.length - 1) > -1 ? this.siteNamesSelected.length - 1 : 'all') + ')'">
+        <b-tab :title="'Sites (' + ((this.siteNamesSelected.length) > 0 ? this.siteNamesSelected.length : 'all') + ')'">
 
           <div v-for="siteCategory in sites" :key="siteCategory.category">
             <b-form-group class="mt-3" :label="siteCategory.category">
@@ -101,7 +101,7 @@
       <b-col md="6" lg="3" v-for="shoot in shoots" :key="shoot.id">
         <b-row class="mb-2">
           <b-col sm="6">
-            <img class="img-fluid" :src="'https://cdnp.kink.com/assets/channels/logo-300x100/home-logo-' + shoot.siteName + '.png'" alt="">
+            <img class="img-fluid" :src="'https://cdnp.kink.com/assets/channels/logo-300x100/home-logo-' + ( shoot.siteName !== 'publicdisgrace' ? shoot.siteName : 'publicdiscrace') + '.png'" alt="">
           </b-col>
         </b-row>
         <b-row>
@@ -119,6 +119,7 @@
         </b-row>
         <b-row class="mb-2">
           <b-col>
+            <p class="mb-0"><strong>Date:</strong> {{ shoot.date.substr(0,10) }}</p>
             <p class="mb-0">
               <strong>{{ shoot.models.length > 1 ? 'Models: ' : 'Model: ' }}</strong>
               <span v-for="(model, index) in shoot.models" :key="model.id"><a :href="'/model?id=' + model.id">{{ model.name ? model.name : model.id }}</a><span>{{ model.gender === 'female' ? ' ♀' : '' }}{{ model.gender === 'male' ? ' ♂️' : ''}}</span><span v-if="index != shoot.models.length - 1">, </span>
@@ -161,7 +162,7 @@ export default {
       tags: [],
       tagsOptions: [],
       tagsSelected: [],
-      sortByOptions: ['title', 'rating', 'votes'],
+      sortByOptions: ['title', 'rating', 'votes', 'date'],
       sortBySelected: 'rating',
       sortOrderOptions: [
         { text: 'Descending', value: '-1' },
@@ -199,6 +200,13 @@ export default {
           console.warn('Bad value saved in the orientationSelected cookie')
         }
       }
+      if (this.$cookie.get('sortBySelected') && this.$cookie.get('sortBySelected') !== 'null') {
+        try {
+          this.sortBySelected = this.$cookie.get('sortBySelected')
+        } catch (error) {
+          console.warn('Bad value saved in the sortBySelected cookie')
+        }
+      }
     },
     async getShoots (removeOldResults) {
       if (!this.noMoreResults || (this.noMoreResults && removeOldResults)) {
@@ -208,6 +216,7 @@ export default {
         if (this.$cookie.get('cookieConsent')) {
           this.$cookie.set('siteNamesSelected', JSON.stringify(this.siteNamesSelected), 1)
           this.$cookie.set('orientationSelected', this.orientationSelected, 1)
+          this.$cookie.set('sortBySelected', this.sortBySelected, 1)
         }
 
         try {

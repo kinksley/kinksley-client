@@ -162,7 +162,8 @@ export default {
       ],
       sortOrderSelected: '-1',
       indeterminate: {},
-      loaderShow: true
+      loaderShow: true,
+      errorDisplay: ''
     }
   },
   mounted () {

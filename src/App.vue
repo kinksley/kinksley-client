@@ -5,12 +5,12 @@
 
       <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-      <b-navbar-brand href="#">Kinksley <small class="text-light">Alpha 0.1</small></b-navbar-brand>
+      <b-navbar-brand href="/">Kinksley <small class="text-light">Alpha 0.1</small></b-navbar-brand>
 
       <b-collapse is-nav id="nav_collapse">
 
         <b-navbar-nav>
-          <b-nav-item href="#">Shoots</b-nav-item>
+          <b-nav-item href="/shoots">Shoots</b-nav-item>
           <b-nav-item href="#" disabled>Models</b-nav-item>
         </b-navbar-nav>
 

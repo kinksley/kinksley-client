@@ -1,9 +1,32 @@
 <template>
 
 <b-container>
-  <b-row>
+  <b-row class="mb-5">
     <b-col>
-      <h2>Shoots</h2>
+      <b-row>
+        <b-col v-if="model.photos" md="3">
+          <img :src="model.photos[0]" :alt="'Photo of ' + model.name" class="img-fluid">
+        </b-col>
+        <b-col>
+          <h2>{{ this.model.name || 'Model #' + this.$route.query.id }}</h2>
+          <ul>
+            <template v-for="(detail,key) in model">
+              <li v-if="key !== 'id' && key !== 'status' && key !== 'name' && (typeof detail === 'string' || typeof detail === 'number')" :key="key">{{ _.startCase(key) }}: {{ detail }}</li>
+            </template>
+          </ul>
+          <!-- <ul>
+            <li><strong>Body Type: </strong>{{  }}</li>
+            <li><strong></strong>{{ }}</li>
+            <li><strong></strong>{{ }}</li>
+            <li><strong></strong>{{ }}</li>
+            <li><strong></strong>{{ }}</li>
+            <li v-if="model.gender === 'female'">Cup size: {{ model.cupSize }}</li>
+            <li v-if="model.gender === 'female'">Breasts: {{ model.breasts }}</li>
+            <li v-if="model.gender === 'male'"><strong>Cock:</strong> {{ model.cockGirth ? model.cockGirth + ', ' : '' }}{{ model.cockLength + ', foreskin ' + model.foreskin }}</li>
+          </ul> -->
+        </b-col>
+      </b-row>
+
     </b-col>
   </b-row>
   <b-row class="mb-5">
@@ -120,7 +143,7 @@
         <b-row class="mb-2">
           <b-col>
             <span>{{ shoot.models.length > 1 ? 'Models: ' : 'Model: ' }}</span>
-            <span v-for="(model, index) in shoot.models" :key="model.id"><a :href="'/model?id=' + model.id">{{ model.name ? model.name : model.id }}</a><span>{{ model.gender === 'female' ? ' ♀' : '' }}{{ model.gender === 'male' ? ' ♂️' : ''}}</span><span v-if="index != shoot.models.length - 1">, </span>
+            <span v-for="(model, index) in shoot.models" :key="model.id"><a :href="'https://www.kink.com/models/' + model.id">{{ model.name ? model.name : model.id }}</a><span>{{ model.gender === 'female' ? ' ♀' : '' }}{{ model.gender === 'male' ? ' ♂️' : ''}}</span><span v-if="index != shoot.models.length - 1">, </span>
             </span>
           </b-col>
         </b-row>
@@ -141,6 +164,7 @@
 </template>
 
 <script>
+import ModelsService from '@/services/ModelsService'
 import ShootsService from '@/services/ShootsService'
 import SitesService from '@/services/SitesService'
 import TagsService from '@/services/TagsService'
@@ -149,6 +173,7 @@ export default {
   data () {
     return {
       shoots: [],
+      model: {},
       orientationOptions: ['straight', 'gay', 'everything'],
       orientationSelected: 'everything',
       sites: sites,
@@ -173,6 +198,7 @@ export default {
   },
   mounted () {
     this.readCookies()
+    this.getModel()
     this.getShoots()
     this.getSites()
     this.getTags()
@@ -195,6 +221,20 @@ export default {
         } catch (error) {
           console.warn('Bad value saved in the orientationSelected cookie')
         }
+      }
+    },
+    async getModel () {
+      try {
+        var response = await ModelsService.fetchModels({
+          id: this.$route.query.id
+        })
+      } catch (error) {
+        this.errorDisplay = error.message
+        this.loaderShow = false
+        console.error(error.message)
+      }
+      if (response && response.data.models.length !== 0) {
+        this.model = response.data.models[0]
       }
     },
     async getShoots (removeOldResults) {

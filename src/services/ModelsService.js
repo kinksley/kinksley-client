@@ -1,7 +1,7 @@
 import Api from '@/services/Api'
 
 export default {
-  fetchShoots (params) {
+  fetchModels (params) {
     return Api().get('/models', {
       params: params
     })

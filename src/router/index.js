@@ -9,7 +9,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Shoots',
+      name: 'Front (-> Shoots)',
       component: Shoots
     },
     {

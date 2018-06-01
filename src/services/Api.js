@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-console.log('axios')
-
 export default () => {
   return axios.create({
     // baseURL: 'http://localhost:8081'

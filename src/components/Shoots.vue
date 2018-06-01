@@ -88,6 +88,11 @@
 
     </b-col>
   </b-row>
+  <b-row v-if="errorDisplay">
+    <b-col>
+      <b-alert show>Something went wrong :( {{ errorDisplay }}</b-alert>
+    </b-col>
+  </b-row>
   <b-row>
       <b-col md="6" lg="3" v-for="shoot in shoots" :key="shoot.id">
         <b-row class="mb-2">
@@ -99,7 +104,7 @@
           <b-col>
             <a :href="'https://www.kink.com/shoot/' + shoot.id">
               <!-- <img class="img-fluid" :src="'https://cdnp.kink.com/imagedb/' + shoot.id + '/i/h/410/0.jpg'" alt=""> -->
-              <div v-if="shoot.photos && shoot.photos[0]" class="embed-responsive embed-responsive-16by9 mb-1" :style="{ backgroundImage: 'url(' + shoot.photos[0] + ')', backgroundPosition: 'center', backgroundSize: 'cover' }">
+              <div v-if="shoot.photos && shoot.photos[0]" class="embed-responsive embed-responsive-16by9 mb-1" :style="{ backgroundColor: '#003846', backgroundImage: 'url(' + shoot.photos[0] + ')', backgroundPosition: 'center', backgroundSize: 'cover' }">
               </div>
               <div v-else class="embed-responsive embed-responsive-16by9 mb-1" :style="{ backgroundColor: '#003846', backgroundImage: 'url(https://cdnp.kink.com/imagedb/' + shoot.id + '/i/h/410/0.jpg)', backgroundPosition: 'center', backgroundSize: 'cover' }">
               </div>
@@ -203,20 +208,39 @@ export default {
       //   this.tagsSelected.splice(this.tagsSelected.indexOf('gay'), 1)
       // }
 
-      const response = await ShootsService.fetchShoots({
-        title: this.titleToSearch,
-        tags: this.tagsSelected,
-        siteNames: this.siteNamesSelected,
-        sortBy: this.sortBySelected,
-        sortOrder: this.sortOrderSelected,
-        skip: removeOldResults ? 0 : this.shoots.length
-      })
+      var response
+      try {
+        response = await ShootsService.fetchShoots({
+          title: this.titleToSearch,
+          tags: this.tagsSelected,
+          siteNames: this.siteNamesSelected,
+          sortBy: this.sortBySelected,
+          sortOrder: this.sortOrderSelected,
+          skip: removeOldResults ? 0 : this.shoots.length
+        })
+      } catch (error) {
+        this.errorDisplay = error.message
+        this.loaderShow = false
+        console.error(error.message)
+      }
 
-      // load results into this.shoots
-      if (removeOldResults) {
-        this.shoots = response.data.shoots
-      } else {
-        this.shoots = this.shoots.concat(response.data.shoots)
+      if (response) {
+        // load results into this.shoots
+        if (removeOldResults) {
+          this.shoots = response.data.shoots
+        } else {
+          this.shoots = this.shoots.concat(response.data.shoots)
+        }
+
+        for (const shoot of this.shoots) {
+          var descriptionShort = shorten(shoot.description, 150)
+          if (descriptionShort.substr(descriptionShort.length - 1).match(/\?|!|\./)) {
+            descriptionShort = descriptionShort.slice(0, -1)
+          }
+          shoot.descriptionShort = descriptionShort + '...'
+        }
+
+        this.loaderShow = false
       }
 
       // truncate the description
@@ -224,64 +248,70 @@ export default {
         if (str.length <= maxLen) return str
         return str.substr(0, str.lastIndexOf(separator, maxLen))
       }
-
-      for (const shoot of this.shoots) {
-        var descriptionShort = shorten(shoot.description, 150)
-        if (descriptionShort.substr(descriptionShort.length - 1).match(/\?|!|\./)) {
-          descriptionShort = descriptionShort.slice(0, -1)
-        }
-        shoot.descriptionShort = descriptionShort + '...'
-      }
-
-      this.loaderShow = false
     },
     async getSites () {
-      const response = await SitesService.fetchSites()
-      var sitesStats = response.data.sites
+      try {
+        var response = await SitesService.fetchSites()
+      } catch (error) {
+        this.errorDisplay = error.message
+        console.error(error.message)
+      }
 
-      for (let i = 0; i < sites.length; i++) {
-        for (const site of sites[i].sites) {
-          var count
-          for (const stat of sitesStats) {
-            if (stat._id === site.value) {
-              count = stat.count
+      if (response) {
+        var sitesStats = response.data.sites
+
+        for (let i = 0; i < sites.length; i++) {
+          for (const site of sites[i].sites) {
+            var count
+            for (const stat of sitesStats) {
+              if (stat._id === site.value) {
+                count = stat.count
+              }
             }
+            // this.siteNamesOptions.push({
+            //   text: site.title + " (" + count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ")",
+            //   value: site.siteName
+            // });
+            site.count = count
+            site.text =
+              site.text +
+              ' (' +
+              site.count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+              ')'
           }
-          // this.siteNamesOptions.push({
-          //   text: site.title + " (" + count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ")",
-          //   value: site.siteName
-          // });
-          site.count = count
-          site.text =
-            site.text +
-            ' (' +
-            site.count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
-            ')'
-        }
 
-        // sort by count of videos
-        sites[i].sites.sort(function (a, b) {
-          return a.count > b.count ? -1 : b.count > a.count ? 1 : 0
-        })
+          // sort by count of videos
+          sites[i].sites.sort(function (a, b) {
+            return a.count > b.count ? -1 : b.count > a.count ? 1 : 0
+          })
+        }
       }
     },
     async getTags () {
-      const response = await TagsService.fetchTags()
-      var tagsToDisplay = response.data.tags.filter(function (item) {
-        return item._id !== 'straight' && item._id !== 'gay'
-      })
-      this.tags = tagsToDisplay
-      for (let i = 0; i < this.tags.length; i++) {
-        this.tagsOptions.push({
-          text:
-            this.tags[i]._id +
-            ' (' +
-            this.tags[i].count
-              .toString()
-              .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
-            ')',
-          value: this.tags[i]._id
+      try {
+        var response = await TagsService.fetchTags()
+      } catch (error) {
+        this.errorDisplay = error.message
+        console.error(error.message)
+      }
+
+      if (response) {
+        var tagsToDisplay = response.data.tags.filter(function (item) {
+          return item._id !== 'straight' && item._id !== 'gay'
         })
+        this.tags = tagsToDisplay
+        for (let i = 0; i < this.tags.length; i++) {
+          this.tagsOptions.push({
+            text:
+              this.tags[i]._id +
+              ' (' +
+              this.tags[i].count
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+              ')',
+            value: this.tags[i]._id
+          })
+        }
       }
     },
     sitesCategoryToggleAll (checked) {

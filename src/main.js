@@ -9,8 +9,8 @@ import VueCookie from 'vue-cookie'
 import VueAnalytics from 'vue-analytics'
 
 // import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap/dist/js/bootstrap.min.js'
-import 'bootswatch/dist/solar/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.js'
+import 'bootswatch/dist/solar/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'bootstrap-vue/dist/bootstrap-vue.js'
 

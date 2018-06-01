@@ -163,7 +163,8 @@ export default {
       sortOrderSelected: '-1',
       indeterminate: {},
       loaderShow: true,
-      errorDisplay: ''
+      errorDisplay: '',
+      noMoreResults: false
     }
   },
   mounted () {
@@ -193,57 +194,58 @@ export default {
       }
     },
     async getShoots (removeOldResults) {
-      this.loaderShow = true
+      if (!this.noMoreResults || (this.noMoreResults && removeOldResults)) {
+        this.loaderShow = true
+        this.noMoreResults = false
 
-      if (this.$cookie.get('cookieConsent')) {
-        this.$cookie.set('siteNamesSelected', JSON.stringify(this.siteNamesSelected), 1)
-        this.$cookie.set('orientationSelected', this.orientationSelected, 1)
-      }
-
-      // remove gay and straight tags from the selected tags (reset)
-      // _.remove(this.tagsSelected, (n) => { return n === 'straight' || n === 'gay'})
-      // if (this.tagsSelected.indexOf('straight') > -1) {
-      //   this.tagsSelected.splice(this.tagsSelected.indexOf('straight'), 1)
-      // }
-      // if (this.tagsSelected.indexOf('gay') > -1) {
-      //   this.tagsSelected.splice(this.tagsSelected.indexOf('gay'), 1)
-      // }
-
-      var response
-      try {
-        response = await ShootsService.fetchShoots({
-          title: this.titleToSearch,
-          tags: this.tagsSelected,
-          siteNames: this.siteNamesSelected,
-          sortBy: this.sortBySelected,
-          sortOrder: this.sortOrderSelected,
-          skip: removeOldResults ? 0 : this.shoots.length
-        })
-      } catch (error) {
-        this.errorDisplay = error.message
-        this.loaderShow = false
-        console.error(error.message)
-      }
-
-      if (response) {
-        // load results into this.shoots
-        if (removeOldResults) {
-          this.shoots = response.data.shoots
-        } else {
-          this.shoots = this.shoots.concat(response.data.shoots)
+        if (this.$cookie.get('cookieConsent')) {
+          this.$cookie.set('siteNamesSelected', JSON.stringify(this.siteNamesSelected), 1)
+          this.$cookie.set('orientationSelected', this.orientationSelected, 1)
         }
 
-        for (const shoot of this.shoots) {
-          var descriptionShort = shorten(shoot.description, 150)
-          if (descriptionShort.substr(descriptionShort.length - 1).match(/\?|!|\./)) {
-            descriptionShort = descriptionShort.slice(0, -1)
+        var response
+        try {
+          response = await ShootsService.fetchShoots({
+            modelId: this.$route.query.id,
+            title: this.titleToSearch,
+            tags: this.tagsSelected,
+            siteNames: this.siteNamesSelected,
+            sortBy: this.sortBySelected,
+            sortOrder: this.sortOrderSelected,
+            skip: removeOldResults ? 0 : this.shoots.length
+          })
+        } catch (error) {
+          this.errorDisplay = error.message
+          this.loaderShow = false
+          console.error(error.message)
+        }
+
+        if (response && response.data.shoots.length !== 0) {
+          // load results into this.shoots
+          if (removeOldResults) {
+            this.shoots = response.data.shoots
+          } else {
+            this.shoots = this.shoots.concat(response.data.shoots)
           }
-          shoot.descriptionShort = descriptionShort + '...'
+
+          for (const shoot of this.shoots) {
+            var descriptionShort = shorten(shoot.description, 150)
+            if (descriptionShort.substr(descriptionShort.length - 1).match(/\?|!|\./)) {
+              descriptionShort = descriptionShort.slice(0, -1)
+            }
+            shoot.descriptionShort = descriptionShort + '...'
+          }
+
+          this.loaderShow = false
+
+          if (response.data.shoots.length < 12) {
+            this.noMoreResults = true
+          }
+        } else {
+          this.noMoreResults = true
+          this.loaderShow = false
         }
-
-        this.loaderShow = false
       }
-
       // truncate the description
       function shorten (str, maxLen, separator = ' ') {
         if (str.length <= maxLen) return str

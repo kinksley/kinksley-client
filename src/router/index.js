@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import Shoots from '@/components/Shoots'
 
 Vue.use(Router)
@@ -10,8 +9,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Hello',
-      component: HelloWorld
+      name: 'Shoots',
+      component: Shoots
     },
     {
       path: '/shoots',

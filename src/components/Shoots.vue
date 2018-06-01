@@ -33,7 +33,7 @@
           </b-form-group>
         </b-tab>
 
-        <b-tab :title="'Sites (' + ((this.siteNamesSelected.length - 1) > -1 ? this.siteNamesSelected.length - 1 : 0) + ')'">
+        <b-tab :title="'Sites (' + ((this.siteNamesSelected.length - 1) > -1 ? this.siteNamesSelected.length - 1 : 'all') + ')'">
 
           <div v-for="siteCategory in sites" :key="siteCategory.category">
             <b-form-group class="mt-3" :label="siteCategory.category">

@@ -50,7 +50,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static/',
-    assetsPublicPath: '/kinksley/kinksley-mevn/kinksley-client/dist/',
+    assetsPublicPath: '/',
 
     /**
      * Source Maps

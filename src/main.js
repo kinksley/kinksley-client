@@ -6,6 +6,7 @@ import VueLodash from 'vue-lodash'
 import App from './App'
 import router from './router'
 import VueCookie from 'vue-cookie'
+import VueAnalytics from 'vue-analytics'
 
 // import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
@@ -17,6 +18,10 @@ Vue.config.productionTip = false
 Vue.use(BootstrapVue)
 Vue.use(VueLodash)
 Vue.use(VueCookie)
+Vue.use(VueAnalytics, {
+  id: 'UA-120221336-1',
+  router
+})
 
 /* eslint-disable no-new */
 new Vue({

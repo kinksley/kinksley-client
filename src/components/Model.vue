@@ -467,6 +467,7 @@ var sites = [
       { text: 'Public Disgrace', value: 'publicdisgrace' },
       { text: 'Sex And Submission', value: 'sexandsubmission' },
       { text: 'Sexual Disgrace', value: 'sexualdisgrace' },
+      { text: 'Sexually Broken', value: 'sexuallybroken' },      
       { text: 'Spizoo', value: 'spizoo' }
     ]
   },

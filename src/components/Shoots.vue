@@ -185,9 +185,9 @@ export default {
         this.noMoreResults = false
 
         if (this.$cookie.get('cookieConsent')) {
-          this.$cookie.set('siteNamesSelected', JSON.stringify(this.siteNamesSelected), 1)
-          this.$cookie.set('orientationSelected', this.orientationSelected, 1)
-          this.$cookie.set('sortBySelected', this.sortBySelected, 1)
+          this.$cookie.set('siteNamesSelected', JSON.stringify(this.siteNamesSelected), 30)
+          this.$cookie.set('orientationSelected', this.orientationSelected, 30)
+          this.$cookie.set('sortBySelected', this.sortBySelected, 30)
         }
 
         try {

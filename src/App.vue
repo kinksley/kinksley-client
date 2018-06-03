@@ -5,13 +5,13 @@
 
       <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-      <b-navbar-brand href="/">Kinksley <small class="text-light">Beta</small></b-navbar-brand>
+      <b-navbar-brand href="/#/">Kinksley <small class="text-light">Beta</small></b-navbar-brand>
 
       <b-collapse is-nav id="nav_collapse">
 
         <b-navbar-nav>
-          <b-nav-item href="/shoots">Shoots</b-nav-item>
-          <b-nav-item href="#" disabled>Models</b-nav-item>
+          <b-nav-item href="/#/shoots">Shoots</b-nav-item>
+          <b-nav-item href="/#/about">About</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
@@ -38,11 +38,11 @@
       <b-col>
         <div :class="{ 'd-none': this.$cookie.get('cookieConsent') }" class="alert alert-info alert-dismissible fade show text-center" role="alert">
           <strong>Cookies!</strong> Kinksley uses them to save your search preferences.
-          <button type="button" class="btn btn-primary" @click="setCookieConsent" data-dismiss="alert" aria-label="Close">
+          <button type="button" class="btn btn-primary my-2 my-md-0" @click="setCookieConsent" data-dismiss="alert" aria-label="Close">
             ✓ Great!
           </button>
-          <button type="button" class="btn btn-secondary" data-dismiss="alert" aria-label="Close">
-            &times; Nope! I don't want cookies.
+          <button type="button" class="btn btn-secondary my-2 my-md-0" data-dismiss="alert" aria-label="Close">
+            &times; No, thanks.
           </button>
         </div>
       </b-col>
@@ -57,7 +57,7 @@ export default {
   name: 'App',
   methods: {
     setCookieConsent () {
-      this.$cookie.set('cookieConsent', 'true', 1)
+      this.$cookie.set('cookieConsent', 'true', 30)
     }
   }
 }

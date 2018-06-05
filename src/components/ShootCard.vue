@@ -21,7 +21,7 @@
     <b-row class="mb-2">
         <b-col>
         <p class="mb-0"><strong>Date:</strong> {{ shoot.date.substr(0,10) }}</p>
-        <p class="mb-0">
+        <p v-if="shoot.models.length > 0" class="mb-0">
             <strong>{{ shoot.models.length > 1 ? 'Models: ' : 'Model: ' }}</strong>
             <span v-for="(model, index) in shoot.models" :key="model.id"><a :href="'/#/model?id=' + model.id">{{ model.name ? model.name : model.id }}</a><span>{{ model.gender === 'female' ? ' ♀' : '' }}{{ model.gender === 'male' ? ' ♂️' : ''}}</span><span v-if="index != shoot.models.length - 1">, </span>
             </span>
